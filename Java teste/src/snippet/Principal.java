@@ -1,0 +1,148 @@
+package snippet;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+class People {
+    private String Name;
+    private LocalDate dateOfBirth;
+
+    public People(String Name, LocalDate dateOfBirth) {
+        this.Name = Name;
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public LocalDate getdateOfBirth() {
+        return dateOfBirth;
+    }
+}
+
+class employee extends People {
+    private BigDecimal Salary;
+    private String Occupation;
+
+    public employee(String Name, LocalDate dateOfBirth, BigDecimal Salary, String Occupation) {
+        super(Name, dateOfBirth);
+        this.Salary = Salary;
+        this.Occupation = Occupation;
+    }
+
+    public BigDecimal getSalary() {
+        return Salary;
+    }
+
+    public String getOccupation() {
+        return Occupation;
+    }
+
+    public void setSalary(BigDecimal add) {
+    }
+}
+
+public class Principal {
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        List<employee> employees = new ArrayList<>();
+
+        // 3.1 - Inserir todos os funcionários
+        employees.add(new employee("Maria", LocalDate.of(2000, Month.OCTOBER, 18), new BigDecimal("2009.44"), "Operador"));
+        employees.add(new employee("João", LocalDate.of(1990, Month.MAY, 12), new BigDecimal("2284.38"), "Operador"));
+        employees.add(new employee("Caio", LocalDate.of(1961, Month.MAY, 02), new BigDecimal("9836.14"), "Coordenador"));
+        employees.add(new employee("Miguel", LocalDate.of(1988, Month.OCTOBER, 14), new BigDecimal("19119.88"), "Diretor"));
+        employees.add(new employee("Alice", LocalDate.of(1995, Month.JANUARY, 05), new BigDecimal("2234.68"), "Recepcionista"));
+        employees.add(new employee("Heitor", LocalDate.of(1999, Month.NOVEMBER, 19), new BigDecimal("1582.72"), "Operador"));
+        employees.add(new employee("Arthur", LocalDate.of(1993, Month.MARCH, 31), new BigDecimal("4071.84"), "Contador"));
+        employees.add(new employee("Laura", LocalDate.of(1994, Month.JULY, 8), new BigDecimal("3017.45"), "Gerente"));
+        employees.add(new employee("Heloisa", LocalDate.of(2003, Month.MAY, 24), new BigDecimal("1606.85"), "Eletricista"));
+        employees.add(new employee("Helena", LocalDate.of(1996, Month.SEPTEMBER, 02), new BigDecimal("2799.93"), "Gerente"));
+        // 3.2 - Remover o funcionário "João" da lista
+        employees.removeIf(employee -> employee.getName().equals("João"));
+
+        // 3.3 - Imprimir todos os funcionários
+        employees.forEach(employee -> {
+            System.out.println("Name: " + employee.getName());
+            System.out.println("Data de Nascimento: " + employee.getdateOfBirth().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            System.out.println("Salário: " + employee.getSalary().toString().replace(".", ","));
+            System.out.println("Função: " + employee.getOccupation());
+            System.out.println();
+        });
+
+        // 3.4 - Aumentar salários em 10%
+        employees.forEach(employee -> {
+            BigDecimal aumento = employee.getSalary().multiply(new BigDecimal("0.10"));
+            employee.setSalary(employee.getSalary().add(aumento));
+        });
+
+        // 3.5 - Agrupar os funcionários por função em um MAP
+        Map<String, List<employee>> employeesPorOccupation = employees.stream()
+                .collect(Collectors.groupingBy(employee::getOccupation));
+
+        // 3.6 - Imprimir os funcionários agrupados por função
+        employeesPorOccupation.forEach((Occupation, lista) -> {
+            System.out.println("Função: " + Occupation);
+            lista.forEach(employee -> {
+                System.out.println("Name: " + employee.getName());
+                System.out.println("Salário: " + employee.getSalary().toString().replace(".", ","));
+            });
+            System.out.println();
+        });
+
+        employees.stream()
+            .filter(employee -> employee.getdateOfBirth().getMonthValue() == 10 || employee.getdateOfBirth().getMonthValue() == 12)
+            .forEach(employee -> {
+                System.out.println("Name: " + employee.getName());
+                System.out.println("Data de Nascimento: " + employee.getdateOfBirth().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                System.out.println();
+            });
+
+        // 3.9 - Imprimir o funcionário com a maior idade
+        LocalDate dataMaisAntiga = LocalDate.now().minusYears(100); // Definindo uma data muito antiga
+        employee maisVelho = null;
+
+        for (employee employee : employees) {
+            if (employee.getdateOfBirth().isBefore(dataMaisAntiga)) {
+                dataMaisAntiga = employee.getdateOfBirth();
+                maisVelho = employee;
+            }
+        }
+
+        if (maisVelho != null) {
+            Period idade = Period.between(maisVelho.getdateOfBirth(), LocalDate.now());
+            System.out.println("Funcionário mais velho:");
+            System.out.println("Name: " + maisVelho.getName());
+            System.out.println("Idade: " + idade.getYears() + " anos");
+        }
+
+        // 3.10 - Imprimir a lista de funcionários por ordem alfabética
+        employees.sort(Comparator.comparing(employee::getName));
+        System.out.println("Funcionários em ordem alfabética:");
+        employees.forEach(employee -> System.out.println(employee.getName()));
+
+        // 3.11 - Imprimir o total dos salários dos funcionários
+        BigDecimal totalSalarys = employees.stream()
+                .map(employee::getSalary)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        System.out.println("Total dos salários: " + totalSalarys.toString().replace(".", ","));
+
+        // 3.12 - Imprimir quantos salários mínimos ganha cada funcionário
+        BigDecimal SalaryMinimo = new BigDecimal("1212.00");
+        System.out.println("Salários em múltiplos de salário mínimo:");
+        employees.forEach(employee -> {
+            BigDecimal multiplicador = employee.getSalary().divide(SalaryMinimo, 2, RoundingMode.DOWN);
+            System.out.println(employee.getName() + ": " + multiplicador + " salários mínimos");
+        });
+    }
+}
+
+
