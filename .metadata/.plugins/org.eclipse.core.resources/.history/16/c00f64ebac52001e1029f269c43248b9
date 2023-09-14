@@ -84,6 +84,28 @@ public class Principal {
             employee.setSalary(employee.getSalary().add(aumento));
         });
 
+        // 3.5 - Agrupar os funcionários por função em um MAP
+        Map<String, List<employee>> employeesPorOccupation = employees.stream()
+                .collect(Collectors.groupingBy(employee::getOccupation));
+
+        // 3.6 - Imprimir os funcionários agrupados por função
+        employeesPorOccupation.forEach((Occupation, lista) -> {
+            System.out.println("Função: " + Occupation);
+            lista.forEach(employee -> {
+                System.out.println("Name: " + employee.getName());
+                System.out.println("Salário: " + employee.getSalary().toString().replace(".", ","));
+            });
+            System.out.println();
+        });
+
+        employees.stream()
+            .filter(employee -> employee.getdateOfBirth().getMonthValue() == 10 || employee.getdateOfBirth().getMonthValue() == 12)
+            .forEach(employee -> {
+                System.out.println("Name: " + employee.getName());
+                System.out.println("Data de Nascimento: " + employee.getdateOfBirth().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                System.out.println();
+            });
+
         // 3.9 - Imprimir o funcionário com a maior idade
         LocalDate dataMaisAntiga = LocalDate.now().minusYears(100); // Definindo uma data muito antiga
         employee maisVelho = null;
